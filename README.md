@@ -1,0 +1,2 @@
+# daily-gist
+freenode subscribe
