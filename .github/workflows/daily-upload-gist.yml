@@ -1,0 +1,40 @@
+name: Daily Upload Gist Files
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # UTC 00:00 -> 北京时间 08:00
+  workflow_dispatch:
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Download Gist files
+        run: |
+          # 日期目录
+          DATE_DIR=$(TZ='Asia/Shanghai' date +'%Y/%-m/%-d')
+          mkdir -p "$DATE_DIR"
+
+          # Gist 文件列表
+          GIST_FILES=(
+            "https://gist.githubusercontent.com/zz-want2sleep/df03dbc2daa2ba5e756245a427359aaf/raw/a6dd0190d8578d95f581a8b60f8440bcd3408381/base64.txt"
+            "https://gist.githubusercontent.com/zz-want2sleep/df03dbc2daa2ba5e756245a427359aaf/raw/a6dd0190d8578d95f581a8b60f8440bcd3408381/mihomo.yaml"
+          )
+
+          for FILE_URL in "${GIST_FILES[@]}"; do
+            FILENAME=$(basename "$FILE_URL")
+            curl -s -o "$DATE_DIR/$FILENAME" "$FILE_URL"
+          done
+
+      - name: Commit and push if changes
+        run: |
+          git config user.name "zzwantsleep"
+          git config user.email "zz670736258@gmail.com"
+          git add .
+          git diff-index --quiet HEAD || git commit -m "Add daily Gist files for $(TZ='Asia/Shanghai' date +'%Y-%m-%d')"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
