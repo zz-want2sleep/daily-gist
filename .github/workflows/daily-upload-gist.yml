@@ -1,40 +1,43 @@
-name: Daily Upload Gist Files
+name: Daily Gist Files Upload
 
+# 触发条件：每天0点或手动触发
 on:
   schedule:
-    - cron: '0 0 * * *' # UTC 00:00 -> 北京时间 08:00
+    - cron: '0 0 * * *'
   workflow_dispatch:
 
 jobs:
-  upload:
+  upload-files:
     runs-on: ubuntu-latest
+
     steps:
+      # 1️⃣ 拉取仓库代码
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Download Gist files
-        run: |
-          # 日期目录
-          DATE_DIR=$(TZ='Asia/Shanghai' date +'%Y/%-m/%-d')
-          mkdir -p "$DATE_DIR"
-
-          # Gist 文件列表
-          GIST_FILES=(
-            "https://gist.githubusercontent.com/zz-want2sleep/df03dbc2daa2ba5e756245a427359aaf/raw/a6dd0190d8578d95f581a8b60f8440bcd3408381/base64.txt"
-            "https://gist.githubusercontent.com/zz-want2sleep/df03dbc2daa2ba5e756245a427359aaf/raw/a6dd0190d8578d95f581a8b60f8440bcd3408381/mihomo.yaml"
-          )
-
-          for FILE_URL in "${GIST_FILES[@]}"; do
-            FILENAME=$(basename "$FILE_URL")
-            curl -s -o "$DATE_DIR/$FILENAME" "$FILE_URL"
-          done
-
-      - name: Commit and push if changes
+      # 2️⃣ 配置 Git 用户
+      - name: Setup Git
         run: |
           git config user.name "zz-want2sleep"
           git config user.email "670736258@qq.com"
+
+      # 3️⃣ 创建目录并下载文件
+      - name: Download Gist files
+        run: |
+          TODAY_DIR=$(date +'%Y/%-m/%-d')
+          mkdir -p "$TODAY_DIR"
+          curl -L -o "$TODAY_DIR/base64.txt" "https://gist.githubusercontent.com/zz-want2sleep/df03dbc2daa2ba5e756245a427359aaf/raw/a6dd0190d8578d95f581a8b60f8440bcd3408381/base64.txt"
+          curl -L -o "$TODAY_DIR/mihomo.yaml" "https://gist.githubusercontent.com/zz-want2sleep/df03dbc2daa2ba5e756245a427359aaf/raw/a6dd0190d8578d95f581a8b60f8440bcd3408381/mihomo.yaml"
+
+      # 4️⃣ 提交更改（如果有）
+      - name: Commit changes
+        run: |
           git add .
-          git diff-index --quiet HEAD || git commit -m "Add daily Gist files for $(TZ='Asia/Shanghai' date +'%Y-%m-%d')"
-          git push
+          git diff --cached --quiet || git commit -m "Add daily Gist files for $(date +'%Y-%m-%d')"
+
+      # 5️⃣ 推送到仓库
+      - name: Push to GitHub
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/zz-want2sleep/daily-gist.git HEAD:main
