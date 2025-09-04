@@ -31,8 +31,8 @@ jobs:
 
       - name: Commit and push if changes
         run: |
-          git config user.name "zzwantsleep"
-          git config user.email "zz670736258@gmail.com"
+          git config user.name "zz-want2sleep"
+          git config user.email "670736258@qq.com"
           git add .
           git diff-index --quiet HEAD || git commit -m "Add daily Gist files for $(TZ='Asia/Shanghai' date +'%Y-%m-%d')"
           git push
