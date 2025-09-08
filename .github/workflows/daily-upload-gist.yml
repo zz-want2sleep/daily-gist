@@ -26,8 +26,8 @@ jobs:
         run: |
           TODAY_DIR=$(date +'%Y/%-m/%-d')
           mkdir -p "$TODAY_DIR"
-          curl -L -o "$TODAY_DIR/base64.txt" "https://gist.githubusercontent.com/zz-want2sleep/df03dbc2daa2ba5e756245a427359aaf/raw/a6dd0190d8578d95f581a8b60f8440bcd3408381/base64.txt"
-          curl -L -o "$TODAY_DIR/mihomo.yaml" "https://gist.githubusercontent.com/zz-want2sleep/df03dbc2daa2ba5e756245a427359aaf/raw/a6dd0190d8578d95f581a8b60f8440bcd3408381/mihomo.yaml"
+          curl -L -o "$TODAY_DIR/base64.txt" "https://gist.githubusercontent.com/zz-want2sleep/df03dbc2daa2ba5e756245a427359aaf/raw/base64.txt"
+          curl -L -o "$TODAY_DIR/mihomo.yaml" "https://gist.githubusercontent.com/zz-want2sleep/df03dbc2daa2ba5e756245a427359aaf/raw/mihomo.yaml"
 
       # 4️⃣ 提交更改（如果有）
       - name: Commit changes
